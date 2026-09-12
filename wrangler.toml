@@ -1,0 +1,6 @@
+name = "alfredlin015-notes"
+compatibility_date = "2026-09-12"
+
+[assets]
+directory = "./public"
+not_found_handling = "404-page"
