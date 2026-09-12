@@ -7,13 +7,50 @@ import { Root as HTMLRoot } from "hast"
 import { MarkdownContent, ProcessedContent } from "../plugins/vfile"
 import { PerfTimer } from "../util/perf"
 import { read } from "to-vfile"
-import { FilePath, QUARTZ, slugifyFilePath } from "../util/path"
+import { FilePath, FullSlug, QUARTZ, slugifyFilePath } from "../util/path"
 import path from "path"
 import workerpool, { Promise as WorkerPromise } from "workerpool"
 import { QuartzLogger } from "../util/log"
 import { trace } from "../util/trace"
 import { BuildCtx, WorkerSerializableBuildCtx } from "../util/ctx"
 import { styleText } from "util"
+import { createHash } from "crypto"
+import YAML from "yaml"
+
+// Pages that must keep their conventional slug no matter what
+// (homepage, 404 page, tag index pages) so site navigation keeps working.
+const RESERVED_SLUGS = new Set(["index", "404"])
+
+// Pulls a short auto slug for a note's URL:
+// 1. If the note's frontmatter sets `slug: something`, use that (sanitized).
+// 2. Otherwise, derive a short, stable code from the file's path so the
+//    same note always gets the same short URL across rebuilds.
+function deriveShortSlug(relativePath: string, rawContent: string): string | undefined {
+  const defaultSlug = slugifyFilePath(relativePath as FilePath)
+  if (RESERVED_SLUGS.has(defaultSlug) || defaultSlug.startsWith("tags/")) {
+    return undefined
+  }
+
+  const fmMatch = /^---\r?\n([\s\S]*?)\r?\n---/.exec(rawContent)
+  if (fmMatch) {
+    try {
+      const fm = YAML.parse(fmMatch[1]) as Record<string, unknown> | undefined
+      const rawSlug = fm?.slug
+      if (typeof rawSlug === "string" && rawSlug.trim().length > 0) {
+        const cleaned = rawSlug
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+        if (cleaned.length > 0) return cleaned
+      }
+    } catch {
+      // ignore malformed frontmatter, fall through to auto-generated slug
+    }
+  }
+
+  return createHash("md5").update(relativePath).digest("hex").slice(0, 7)
+}
 
 export type QuartzMdProcessor = Processor<MDRoot, MDRoot, MDRoot>
 export type QuartzHtmlProcessor = Processor<undefined, MDRoot, HTMLRoot>
@@ -102,7 +139,8 @@ export function createFileParser(ctx: BuildCtx, fps: FilePath[]) {
         // base data properties that plugins may use
         file.data.filePath = file.path as FilePath
         file.data.relativePath = path.posix.relative(argv.directory, file.path) as FilePath
-        file.data.slug = slugifyFilePath(file.data.relativePath)
+        const shortSlug = deriveShortSlug(file.data.relativePath, file.value.toString())
+        file.data.slug = (shortSlug ?? slugifyFilePath(file.data.relativePath)) as FullSlug
 
         const ast = processor.parse(file)
         const newAst = await processor.run(ast, file)
