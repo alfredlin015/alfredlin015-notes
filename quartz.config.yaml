@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: 自明人富老師
+  pageTitle: 自明身心科學
   pageTitleSuffix: ""
   enableSPA: true
   enablePopovers: true
