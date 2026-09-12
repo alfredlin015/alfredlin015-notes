@@ -1,0 +1,463 @@
+<title>自明筆記發布手冊</title>
+<style>
+  :root {
+    --bg: #f2f1ec;
+    --surface: #ffffff;
+    --ink: #232420;
+    --ink-soft: #5b5d55;
+    --line: #dedcd2;
+    --accent: #2f6f68;
+    --accent-ink: #16332f;
+    --accent-soft: #e3efec;
+    --warn: #a8631f;
+    --warn-soft: #f6e9d8;
+    --code-bg: #1d2420;
+    --code-ink: #dce8e3;
+    --code-accent: #7fd7c4;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16181a;
+      --surface: #1e2123;
+      --ink: #e9e7e0;
+      --ink-soft: #a3a29a;
+      --line: #33363570;
+      --accent: #6fc9be;
+      --accent-ink: #0f201d;
+      --accent-soft: #1e2f2c;
+      --warn: #e0a75c;
+      --warn-soft: #332a1a;
+      --code-bg: #0f1412;
+      --code-ink: #d9e7e1;
+      --code-accent: #7fd7c4;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #16181a;
+    --surface: #1e2123;
+    --ink: #e9e7e0;
+    --ink-soft: #a3a29a;
+    --line: #33363570;
+    --accent: #6fc9be;
+    --accent-ink: #0f201d;
+    --accent-soft: #1e2f2c;
+    --warn: #e0a75c;
+    --warn-soft: #332a1a;
+    --code-bg: #0f1412;
+    --code-ink: #d9e7e1;
+    --code-accent: #7fd7c4;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Sans Pro', 'Noto Sans TC', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Schibsted Grotesk', 'Noto Sans TC', sans-serif;
+    text-wrap: balance;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  code, .mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+
+  /* ---- masthead ---- */
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .masthead-title {
+    font-size: clamp(1.7rem, 4vw, 2.15rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .masthead-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .masthead-meta a { color: var(--accent-ink); }
+  :root:not([data-theme="light"]) .masthead-meta a,
+  [data-theme="dark"] .masthead-meta a { color: var(--code-accent); }
+
+  /* ---- section headers ---- */
+  section { margin-bottom: 48px; }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  :root:not([data-theme="light"]) .section-label,
+  [data-theme="dark"] .section-label { color: var(--code-accent); }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .section-desc {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    max-width: 62ch;
+  }
+
+  /* ---- step track ---- */
+  .steps {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 18px;
+    position: relative;
+    padding-bottom: 28px;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .step-rail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    color: var(--accent-ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  :root:not([data-theme="light"]) .step-num,
+  [data-theme="dark"] .step-num { color: var(--code-accent); }
+
+  .step:not(:last-child) .step-rail::after {
+    content: "";
+    position: absolute;
+    top: 34px;
+    bottom: -28px;
+    width: 2px;
+    background: var(--line);
+  }
+
+  .step-body {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 18px;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 1.02rem;
+    margin-bottom: 4px;
+  }
+
+  .step-detail {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+
+  .step-detail p { margin: 0 0 8px; }
+  .step-detail p:last-child { margin-bottom: 0; }
+
+  .chip {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 1px 7px;
+    border-radius: 3px;
+    margin: 1px 0;
+  }
+  :root:not([data-theme="light"]) .chip,
+  [data-theme="dark"] .chip { color: var(--code-accent); }
+
+  /* ---- reference grid ---- */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .ref-cell {
+    background: var(--surface);
+    padding: 14px 16px;
+  }
+
+  .ref-key {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  .ref-val {
+    font-size: 0.94rem;
+    word-break: break-word;
+  }
+
+  .ref-val a { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--line); }
+  :root:not([data-theme="light"]) .ref-val a,
+  [data-theme="dark"] .ref-val a { color: var(--code-accent); }
+
+  /* ---- callout ---- */
+  .callout {
+    display: flex;
+    gap: 12px;
+    background: var(--warn-soft);
+    border: 1px solid var(--warn);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-top: 20px;
+  }
+
+  .callout-mark {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    color: var(--warn);
+    flex-shrink: 0;
+  }
+
+  .callout-body { font-size: 0.92rem; }
+  .callout-body strong { color: var(--warn); }
+
+  /* ---- code block ---- */
+  pre.term {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 6px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    margin: 10px 0 0;
+    line-height: 1.7;
+  }
+  pre.term .c { color: var(--code-accent); }
+
+  /* ---- glossary ---- */
+  dl.glossary {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: minmax(120px, 160px) 1fr;
+    row-gap: 14px;
+    column-gap: 18px;
+  }
+
+  dl.glossary dt {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--accent-ink);
+  }
+  :root:not([data-theme="light"]) dl.glossary dt,
+  [data-theme="dark"] dl.glossary dt { color: var(--code-accent); }
+
+  dl.glossary dd {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 520px) {
+    dl.glossary { grid-template-columns: 1fr; row-gap: 4px; }
+    dl.glossary dt { margin-top: 6px; }
+  }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Source+Sans+Pro:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="masthead-title">自明筆記發布手冊</div>
+    <div class="masthead-meta">
+      blog.alfredlin015.com<br>
+      github.com/alfredlin015/alfredlin015-notes
+    </div>
+  </div>
+
+  <section>
+    <div class="section-label">Daily Workflow</div>
+    <div class="section-title">日常發布：三步驟</div>
+    <div class="section-desc">從 Obsidian 寫完筆記到出現在網站上，只需要這三步，全程不用碰終端機或程式碼。</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-rail"><div class="step-num">1</div></div>
+        <div class="step-body">
+          <div class="step-title">在 Obsidian 寫筆記，標記要公開</div>
+          <div class="step-detail">
+            <p>在 <span class="chip">OneSyncFiles</span> 這個 vault 裡正常寫筆記。想公開的那篇，打開屬性面板，把 <span class="chip">publish</span> 打勾。</p>
+            <p>想要好記的網址（例如分享用），就再加一個 <span class="chip">slug</span> 屬性自己命名；不加的話系統會自動配一組短代號。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-rail"><div class="step-num">2</div></div>
+        <div class="step-body">
+          <div class="step-title">開啟 Publication Center 發布</div>
+          <div class="step-detail">
+            <p><span class="chip">Ctrl+P</span> → 輸入 <span class="chip">Quartz Syncer: Open Publication Center</span></p>
+            <p>在 <strong>Unpublished</strong> 清單勾選這篇筆記 → 按 <strong>Publish to remote</strong>。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-rail"><div class="step-num">3</div></div>
+        <div class="step-body">
+          <div class="step-title">等 1–2 分鐘，網站自動更新</div>
+          <div class="step-detail">
+            <p>Cloudflare 偵測到 GitHub 有新內容，會自動重新建置整個網站，不用手動觸發，也不用再打開電腦以外的任何東西。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Reference</div>
+    <div class="section-title">重要資訊速查</div>
+
+    <div class="ref-grid">
+      <div class="ref-cell">
+        <div class="ref-key">公開網站</div>
+        <div class="ref-val"><a href="https://blog.alfredlin015.com">blog.alfredlin015.com</a></div>
+      </div>
+      <div class="ref-cell">
+        <div class="ref-key">GitHub Repo</div>
+        <div class="ref-val"><a href="https://github.com/alfredlin015/alfredlin015-notes">alfredlin015-notes</a></div>
+      </div>
+      <div class="ref-cell">
+        <div class="ref-key">筆記庫（Vault）</div>
+        <div class="ref-val">OneDrive → <span class="mono">OneSyncFiles</span></div>
+      </div>
+      <div class="ref-cell">
+        <div class="ref-key">遠端內容資料夾</div>
+        <div class="ref-val">repo 裡的 <span class="mono">content/</span></div>
+      </div>
+      <div class="ref-cell">
+        <div class="ref-key">部署平台</div>
+        <div class="ref-val">Cloudflare Workers（自動觸發）</div>
+      </div>
+      <div class="ref-cell">
+        <div class="ref-key">版面設定檔</div>
+        <div class="ref-val"><span class="mono">quartz.config.yaml</span></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-mark">!</div>
+      <div class="callout-body">
+        <strong>GitHub Token 將於 2026-10-12 到期。</strong>
+        到期後 Obsidian 會無法推送新內容。屆時回到 GitHub → Settings → Developer settings → Personal access tokens，重新產生一組 classic token（記得勾 <span class="mono">repo</span> 權限），貼回 Quartz Syncer 的 Git 設定頁更新即可。
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-label">Customization</div>
+    <div class="section-title">想調整網站外觀時</div>
+    <div class="section-desc">標題文字、顏色、字體都在 <span class="chip">quartz.config.yaml</span> 裡，改完請 Claude 幫你重新建置＋部署，或照下面指令自己跑。</div>
+    <pre class="term">cd alfredlin015.com
+<span class="c">＃ 改好 quartz.config.yaml 之後，先本機建置確認沒壞</span>
+npx quartz build
+<span class="c">＃ 確認沒問題後推上 GitHub，Cloudflare 會自動部署</span>
+git add -A
+git commit -m "調整網站外觀"
+git pull --rebase origin main
+git push</pre>
+  </section>
+
+  <section>
+    <div class="section-label">Glossary</div>
+    <div class="section-title">名詞對照</div>
+    <dl class="glossary">
+      <dt>Vault</dt>
+      <dd>Obsidian 的筆記庫資料夾，你的私人知識庫，不會整個公開。</dd>
+      <dt>Frontmatter</dt>
+      <dd>筆記最上方用 <span class="mono">---</span> 包起來的屬性區塊，儲存 publish、slug 等設定，不會顯示在正文裡。</dd>
+      <dt>Slug</dt>
+      <dd>文章網址裡的那段代號，例如 <span class="mono">blog.alfredlin015.com/8fa4f30</span> 裡的 <span class="mono">8fa4f30</span>。</dd>
+      <dt>Repo</dt>
+      <dd>存放網站程式碼與已發布筆記的 GitHub 倉庫，是 Obsidian 與 Cloudflare 之間的橋樑。</dd>
+      <dt>Deploy</dt>
+      <dd>把最新內容真正發布到公開網址上線的動作，這裡由 Cloudflare 自動完成。</dd>
+    </dl>
+  </section>
+
+  <footer>
+    最後更新於 Obsidian → Quartz → Cloudflare 建站專案
+  </footer>
+
+</div>
